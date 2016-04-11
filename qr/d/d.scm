@@ -49,6 +49,6 @@
   (line-read (replist$ 3 read))
   )
 
-(define (solve . args)
+(define (solve K C S)
   (error "not implemented")
   )
