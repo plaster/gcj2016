@@ -66,6 +66,15 @@
 ;; GGL -> GGGGGGGGL -> GGGGGGGGGGGGGGGGGGGGGGGGGGL
 ;; GGG -> GGGGGGGGG -> GGGGGGGGGGGGGGGGGGGGGGGGGGG
 
+(define (next-level seq)
+  (apply append
+         (map (lambda (c)
+                (if (eq? c 'G)
+                  (make-list (length seq) 'G)
+                  seq
+                  ))
+              seq)))
+
 (define (solve K C S)
   (error "not implemented")
   )
