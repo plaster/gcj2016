@@ -43,10 +43,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (main args)
-  (gcj-interact parse solve))
+  (gcj-interact parse solve (apply$ standard-formatter)))
 
 (define (parse)
-  (line-read (replist$ 3 read))
+  (apply values (line-read (replist$ 3 read)))
   )
 
 ;; L -> LL -> LLLL -> ...
@@ -66,18 +66,9 @@
 ;; GGL -> GGGGGGGGL -> GGGGGGGGGGGGGGGGGGGGGGGGGGL
 ;; GGG -> GGGGGGGGG -> GGGGGGGGGGGGGGGGGGGGGGGGGGG
 
-(define (length-of K C)
-  (expt K C))
-
-(define (next-level seq)
-  (apply append
-         (map (lambda (c)
-                (if (eq? c 'G)
-                  (make-list (length seq) 'G)
-                  seq
-                  ))
-              seq)))
-
 (define (solve K C S)
-  (error "not implemented")
+  (or (= K S)
+    (error "not implemented")
+    )
+  (iota S 1 (expt K (- C 1)))
   )
