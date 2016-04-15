@@ -66,6 +66,9 @@
 ;; GGL -> GGGGGGGGL -> GGGGGGGGGGGGGGGGGGGGGGGGGGL
 ;; GGG -> GGGGGGGGG -> GGGGGGGGGGGGGGGGGGGGGGGGGGG
 
+(define (length-of K C)
+  (expt K C))
+
 (define (next-level seq)
   (apply append
          (map (lambda (c)
