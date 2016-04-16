@@ -1,6 +1,7 @@
 (use gauche.parameter)
 (use util.match)
 (use gauche.sequence)
+(use text.tree)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; common library for GCJ ;;;;
@@ -43,12 +44,29 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (main args)
-  (gcj-interact parse solve))
+  (gcj-interact parse solve tree->string))
 
 (define (parse)
-  (error "not implemented")
+  (string->list (read-line))
   )
 
-(define (solve . args)
-  (error "not implemented")
-  )
+(define (solve chs)
+  (match chs
+    [(c . chs)
+     (let loop [[ c0 c ]
+                [ chs chs ]
+                [ t `(,c) ]
+                ]
+       (match chs
+         [ ()
+          t
+          ]
+         [ ( c1 . chs )
+          (if (char<? c1 c0)
+            (loop c0 chs (cons t c1))
+            (loop c1 chs (cons c1 t))
+            )
+           ]
+         ))
+     ]
+    ))

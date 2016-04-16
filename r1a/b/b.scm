@@ -43,12 +43,36 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (main args)
-  (gcj-interact parse solve))
+  (gcj-interact parse solve
+                (lambda (ls)
+                  (string-join (map x->string ls) " ")
+                  )
+                ))
 
 (define (parse)
-  (error "not implemented")
+  (let1 N (line-read)
+    (values N
+            (replist (- (* 2 N) 1)
+                     (line-read$ (replist$ N read)))))
   )
 
-(define (solve . args)
-  (error "not implemented")
-  )
+(define (solve N reports)
+  (let1 v (make-vector 2500 0)
+    (for-each
+      (^ (report)
+        (for-each
+          (^ (h)
+            (update! (vector-ref v (- h 1)) (pa$ + 1))
+            )
+          report))
+      reports
+      )
+    (let1 r '()
+      (vector-for-each-with-index
+        (^ (h f)
+          (if (odd? f)
+            (push! r (+ h 1)))
+          )
+        v)
+      (reverse r)
+      )))
