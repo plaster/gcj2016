@@ -56,9 +56,12 @@
 
 (define (traverse N BFFs)
   (rlet1 v (make-vector N #f)
-    ;; v[i] = #f (not visited)
-    ;;      | #t (in traversal)
-    ;;      | #( circuit-size end-point distance )
+    ;; v[i] = #f -- not visited
+    ;;      | #t -- just in traversal
+    ;;      | #( sz rep-point #f 0 )
+    ;;           -- in loop of rep-point, size=sz. 
+    ;;      | #( sz rep-point end-point dt )
+    ;;           -- at distance dt from end-point, which is included loop of rep-point
     (dotimes (i N)
       (let dfs
         [[i i]]
@@ -66,6 +69,11 @@
           [ #f
             (set! (vector-ref v i) #t)
             (match (dfs (vector-ref BFFs i))
+              [(and v
+                 #( sz rep-point #f 0 )
+                 )
+               ]
+
               )
             ]
           [ #t
