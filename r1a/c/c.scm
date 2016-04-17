@@ -59,18 +59,20 @@
     ;; v[i] = #f (not visited)
     ;;      | #t (in traversal)
     ;;      | #( circuit-size end-point distance )
-    (let loop
-      [[i 0]]
-      (and (< i N)
+    (dotimes (i N)
+      (let dfs
+        [[i i]]
         (match (vector-ref v i)
           [ #f
+            (set! (vector-ref v i) #t)
+            (match (dfs (vector-ref BFFs i))
+              )
             ]
           [ #t
             ]
           [ #(circuit-size end-point distance)
             ]
           )
-        (loop (+ i 1))
         ))))
 
 (define (solve N BFFs)
