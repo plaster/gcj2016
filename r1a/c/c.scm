@@ -58,9 +58,9 @@
   (rlet1 v (make-vector N #f)
     ;; v[i] = #f -- not visited
     ;;      | #t -- just in traversal
-    ;;      | #( sz rep-point #f 0 )
+    ;;      | #( sz point-list #f 0 )
     ;;           -- in loop of rep-point, size=sz. 
-    ;;      | #( sz rep-point end-point dt )
+    ;;      | #( sz point-list end-point dt )
     ;;           -- at distance dt from end-point, which is included loop of rep-point
     (dotimes (i N)
       (let dfs
@@ -69,14 +69,35 @@
           [ #f
             (set! (vector-ref v i) #t)
             (match (dfs (vector-ref BFFs i))
-              [(and v
-                 #( sz rep-point #f 0 )
+              [#('inside point-list end-point cont ) ;; in loop
+               (cond
+                 [(= end-point i)
+                  (let* [[sz (length point-list)]
+                         [e (vector sz point-list end-point 0)]]
+                    (cont point-list)
+                    (set! (vector-ref v i) e)
+                    (vector 'outside sz point-list end-point 0)
+                    )
+                  ]
+                 [else
+                   (vector 'inside (cons i point-list)
+                           (^ (e)
+                             (set! (vector-ref v i) e)
+                             (cont e)))
+                   ]
                  )
                ]
-
+              [#('outside sz point-list end-point dt)
+               (set! (vector-ref v i)
+                 (vector sz point-list end-point (+ dt 1)))
+               (vector 'outside sz point-list end-point (+ dt 1))
+               ]
               )
             ]
           [ #t
+            (vector 'inside (list i)
+                    (^ (e)
+                      (set! (vector-ref v i) e)))
             ]
           [ #(circuit-size end-point distance)
             ]
