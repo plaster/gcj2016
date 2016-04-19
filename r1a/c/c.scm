@@ -2,6 +2,7 @@
 (use util.match)
 (use gauche.sequence)
 (use util.combinations)
+(use gauche.collection)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; common library for GCJ ;;;;
@@ -58,7 +59,7 @@
   (rlet1 v (make-vector N #f)
     ;; v[i] = #f -- not visited
     ;;      | #t -- just in traversal
-    ;;      | #( sz point-list #f 0 )
+    ;;      | #( sz point-list rep-point 0 )
     ;;           -- in loop of rep-point, size=sz. 
     ;;      | #( sz point-list end-point dt )
     ;;           -- at distance dt from end-point, which is included loop of rep-point
@@ -74,37 +75,80 @@
                  [(= end-point i)
                   (let* [[sz (length point-list)]
                          [e (vector sz point-list end-point 0)]]
-                    (cont point-list)
+                    (cont e)
                     (set! (vector-ref v i) e)
-                    (vector 'outside sz point-list end-point 0)
+                    (vector sz point-list end-point 0)
                     )
                   ]
                  [else
-                   (vector 'inside (cons i point-list)
+                   (vector 'inside (cons i point-list) end-point
                            (^ (e)
                              (set! (vector-ref v i) e)
                              (cont e)))
                    ]
                  )
                ]
-              [#('outside sz point-list end-point dt)
-               (set! (vector-ref v i)
-                 (vector sz point-list end-point (+ dt 1)))
-               (vector 'outside sz point-list end-point (+ dt 1))
-               ]
+              [#(sz point-list end-point dt)
+               (rlet1 e (if (= dt 0)
+                          (vector sz point-list (vector-ref BFFs i) 1)
+                          (vector sz point-list end-point (+ dt 1))
+                          )
+                 (set! (vector-ref v i) e)
+                 ) ]
               )
             ]
           [ #t
-            (vector 'inside (list i)
+            (vector 'inside (list i) i
                     (^ (e)
                       (set! (vector-ref v i) e)))
             ]
-          [ #(circuit-size end-point distance)
-            ]
+          [ (and e #(sz point-list end-point dt))
+           e
+           ]
           )
         ))))
 
+(define (loop-size-of v)
+  (match v
+    [ #(sz _ _ _)
+      sz ]))
+
+(define (point-list-of v)
+  (match v
+    [ #(_ point-list _ _)
+      point-list
+      ]))
+
+(define (max-size-of vs)
+  (let loop
+    [[ vs vs ]
+     [ dt-left 0]
+     [ dt-right 0]
+     ]
+    (match vs
+      [()
+       (+ 2 dt-left dt-right)
+       ]
+      [( #( 2 (p0 p1) pe dt) . vs)
+       (cond
+         [ (= pe p0)
+          (loop vs (max dt-left dt) dt-right)
+          ]
+         [ (= pe p1)
+          (loop vs dt-left (max dt-right dt))
+          ]
+         [else
+           (errorf "no match end-point: ~s for loop ~s" pe `(,p0 ,p1))
+           ])
+       ])))
+
 (define (solve N BFFs)
-  ;; single N-loop
-  ;; multiple 2-loops
-  )
+  ;; single N-loop or
+  ;; multiple 2-loop (and its trailer)s
+  (let1 ls (vector->list (traverse N BFFs))
+    (max (apply max (map loop-size-of ls))
+         (apply + (map max-size-of
+                       (group-collection (filter (.$ (pa$ = 2) loop-size-of) ls)
+                                         :key point-list-of
+                                         )
+                       )))))
