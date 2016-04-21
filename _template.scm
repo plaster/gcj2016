@@ -28,22 +28,23 @@
 
 (define (standard-formatter . xs) (string-join (map x->string xs) " "))
 
-(define (gcj-interact parser solver :optional [formatter standard-formatter])
+(define (gcj-interact parser solver emitter)
   (dotimes (n (line-read))
     (parameterize [[gcj-current-case (+ n 1)]]
-      (format #t "Case #~a: ~a\n"
-              (gcj-current-case)
-              ((compose formatter
-                        solver
-                        parser))
-              ))))
+      ((.$ emitter solver parser)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; problem specific code ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (main args)
-  (gcj-interact parse solve))
+  (gcj-interact parse solve emit))
+
+(define (emit . xs)
+  (format #t "Case #~a: ~a\n"
+          (gcj-current-case)
+          (string-join (map x->string xs) " ")
+          ))
 
 (define (parse)
   (error "not implemented")
