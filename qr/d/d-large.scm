@@ -43,7 +43,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (main args)
-  (gcj-interact parse solve (apply$ standard-formatter)))
+  (gcj-interact parse solve custom-format))
+
+(define (custom-format ls)
+  (if ls
+    ($ string-join (map x->string ls) " ")
+    'IMPOSSIBLE
+    ))
 
 (define (parse)
   (apply values (line-read (replist$ 3 read)))
@@ -67,8 +73,13 @@
 ;; GGG -> GGGGGGGGG -> GGGGGGGGGGGGGGGGGGGGGGGGGGG
 
 (define (solve K C S)
-  (or (= K S)
-    (error "not implemented")
-    )
-  (iota S 1 (expt K (- C 1)))
-  )
+  (let1 ls (map
+             (^ (factors)
+               ($ apply + 1
+                 $ map * factors
+                 $ map (pa$ expt K)
+                 $ iota C)
+               )
+             (group-sequence (iota K) :key (cut quotient <> C))
+             )
+    (and (<= (length ls) S) ls)))
