@@ -58,5 +58,32 @@
     ))
 
 (define (solve Smax SS)
-  (values Smax SS)
-  )
+  (let loop
+    [[ extra 0]
+     [ standing 0]
+     [ ls #|
+          ($ map (^x (vector (length x)
+                             (car x)))
+            $ group-sequence $ sort SS)
+          |#
+          (map vector SS (iota (+ Smax 1)))
+          ]
+     ]
+    (match ls
+      [ ()
+       (if (zero? standing)
+         1
+         extra
+         )
+       ]
+      [ ( #(len x) . ls)
+       (if (< standing x)
+         (loop (+ extra (- x standing))
+               (+ x len)
+               ls)
+         (loop extra
+               (+ standing len)
+               ls)
+         )
+       ]
+      )))
