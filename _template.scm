@@ -26,8 +26,6 @@
 
 (define gcj-current-case (make-parameter #f))
 
-(define (standard-formatter . xs) (string-join (map x->string xs) " "))
-
 (define (gcj-interact parser solver emitter)
   (dotimes (n (line-read))
     (parameterize [[gcj-current-case (+ n 1)]]
