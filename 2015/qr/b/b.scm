@@ -57,7 +57,7 @@
   (let loop [[PS ($ reverse $ sort PS)]]
     (match PS
       [ (P . PS)
-       (if (<= P 2)
+       (if (<= P 3)
          P
          ($ min P
            $ + 1
@@ -65,8 +65,8 @@
            $ reverse
            $ sort
            $ cons*
-           (+ (div P 2) (quotient P 2))
-           (div P 2)
+           (+ (quotient P 2) (modulo P 2))
+           (quotient P 2)
            PS
            ))
          ]
