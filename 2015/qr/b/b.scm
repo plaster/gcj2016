@@ -53,5 +53,6 @@
     ))
 
 (define (solve D PS)
+  ;; 方針: 常にこうなる min(最大のものを半分にして次へ || 打ち切り)
   (values D PS)
   )
