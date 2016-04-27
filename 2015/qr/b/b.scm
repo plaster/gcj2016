@@ -54,5 +54,23 @@
 
 (define (solve D PS)
   ;; 方針: 常にこうなる min(最大のものを半分にして次へ || 打ち切り)
-  (values D PS)
-  )
+  (let loop [[PS ($ reverse $ sort PS)]]
+    (match PS
+      [ (P . PS)
+       (if (<= P 2)
+         P
+         ($ min P
+           $ + 1
+           $ loop
+           $ reverse
+           $ sort
+           $ cons*
+           (+ (div P 2) (quotient P 2))
+           (div P 2)
+           PS
+           ))
+         ]
+      [ ()
+       0
+       ]
+      )))
