@@ -1,3 +1,5 @@
+;; running on Gauche 0.9.4 http://practical-scheme.net/gauche/
+
 (use gauche.parameter)
 (use util.match)
 (use gauche.sequence)
