@@ -1,0 +1,21 @@
+#!/bin/bash
+
+GOSHCMD=/c/opt/Gauche/bin/gosh
+
+if test -t 0
+then
+	if test -t 1
+	then
+		exec winpty "${GOSHCMD}" "$@"
+	else
+		cat | "${GOSHCMD}" "$@"
+	fi
+else
+	if test -t 1
+	then
+		"${GOSHCMD}" "$@" | cat
+		exit ${PIPESTATUS[0]}
+	else
+		exec "${GOSHCMD}" "$@"
+	fi
+fi
