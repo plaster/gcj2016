@@ -33,6 +33,21 @@
     (parameterize [[gcj-current-case (+ n 1)]]
       ((.$ emitter solver parser)))))
 
+(define (gcj-interact-parallel parser solver emitter)
+  (let* [[n (line-read)]
+         [parsed (make-vector n #f)]
+         [solved (make-vector n #f)]
+         ]
+    (dotimes (i n)
+      (call-with-values parser
+                        (cut set! (vector-ref parsed i) <...>))
+      )
+    ;;; TODO: run solver parallel and store result to vector solved
+    (dotimes (i n)
+      (parameterize [[gcj-current-case (+ i 1)]]
+        (apply emitter (vector-ref solved i))
+        ))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; problem specific code ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
