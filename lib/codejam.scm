@@ -6,6 +6,7 @@
 (select-module codejam)
 
 (use gauche.parameter)
+(use gauche.threads)
 (use util.match)
 
 ;;; I/O helper
@@ -83,12 +84,34 @@
   (let* [[n (line-read)]
          [parsed (make-vector n #f)]
          [solved (make-vector n #f)]
+         [unsolved ($ atom $ vector $ skew-heap $ iota n)]
          ]
     (dotimes (i n)
       (call-with-values parser
                         (cut set! (vector-ref parsed i) <...>))
       )
-    ;;; TODO: run solver parallel and store result to vector solved
+    (let1 thread-body (^ ()
+                        (let loop []
+                          (let1 i (atomic unsolved
+                                    (^ (v)
+                                      (receive (i h)
+                                               (skew-heap-extract-min (vector-ref v 0))
+                                         (and h
+                                           (begin
+                                             (set! (vector-ref v 0) h)
+                                             i)))))
+                            (and i
+                              (begin
+                                (receive res (apply solver (vector-ref parsed i))
+                                  (atomic unsolved
+                                    (^ (_)
+                                      (set! (vector-ref solved i) res))))
+                                (loop)
+                                )))))
+      (let1 threads (replist parallel-level (cut make-thread thread-body))
+        (for-each thread-start! threads)
+        (for-each thread-join! threads)
+        ))
     (dotimes (i n)
       (parameterize [[current-case (+ i 1)]]
         (apply emitter (vector-ref solved i))
