@@ -53,10 +53,11 @@
       heap0
       ]
     [ #( #(e0 l0 r0) #(e1 l1 r1) )
-      (if (<= e0 e1)
-        (vector e0 (delay (skew-heap-union heap1 r0)) l0)
-        (vector e1 (delay (skew-heap-union heap0 r1)) l1)
-        )
+      (delay
+        (if (<= e0 e1)
+          (vector e0 (skew-heap-union heap1 r0) l0)
+          (vector e1 (skew-heap-union heap0 r1) l1)
+          ))
       ]
     ))
 
