@@ -26,14 +26,14 @@
 (define (read-matrix rows cols :optional [reader read-char])
   (replist rows (line-read$ (replist$ cols reader))))
 
-(define gcj-current-case (make-parameter #f))
+(define current-case (make-parameter #f))
 
-(define (gcj-interact parser solver emitter)
+(define (run parser solver emitter)
   (dotimes (n (line-read))
-    (parameterize [[gcj-current-case (+ n 1)]]
+    (parameterize [[current-case (+ n 1)]]
       ((.$ emitter solver parser)))))
 
-(define (gcj-interact-parallel parser solver emitter)
+(define (run/parallel parser solver emitter :optional [parallel-level 4])
   (let* [[n (line-read)]
          [parsed (make-vector n #f)]
          [solved (make-vector n #f)]
@@ -44,7 +44,7 @@
       )
     ;;; TODO: run solver parallel and store result to vector solved
     (dotimes (i n)
-      (parameterize [[gcj-current-case (+ i 1)]]
+      (parameterize [[current-case (+ i 1)]]
         (apply emitter (vector-ref solved i))
         ))))
 
@@ -53,11 +53,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (main args)
-  (gcj-interact parse solve emit))
+  (run parse solve emit))
 
 (define (emit . xs)
   (format #t "Case #~a: ~a\n"
-          (gcj-current-case)
+          (current-case)
           (string-join (map x->string xs) " ")
           ))
 
