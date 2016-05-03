@@ -88,7 +88,7 @@
          ]
     (dotimes (i n)
       (call-with-values parser
-                        (cut set! (vector-ref parsed i) <...>))
+                        (^ pvs (set! (vector-ref parsed i) pvs)))
       )
     (let1 thread-body (^ ()
                         (let loop []
