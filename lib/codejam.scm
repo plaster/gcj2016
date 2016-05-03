@@ -1,4 +1,4 @@
-;;; codejam - Common Utility for Google Code Jam
+;;;; codejam - Common Utility for Google Code Jam
 
 (define-module codejam
   (export-all))
@@ -7,7 +7,7 @@
 
 (use gauche.parameter)
 
-;; I/O helper
+;;; I/O helper
 
 (define (line-read :optional [reader read])
   (with-input-from-string (read-line) reader))
@@ -27,11 +27,50 @@
 (define (read-matrix rows cols :optional [reader read-char])
   (replist rows (line-read$ (replist$ cols reader))))
 
-;; Parameter to output "Case #~a:"
+;;; Parameter to output "Case #~a:"
 
 (define current-case (make-parameter #f))
 
-;; Runner
+;;; Common Data structure
+
+;; Skew Heap
+(define (skew-heap seq)
+  (fold skew-heap-insert '#() seq)
+  )
+
+(define (skew-heap-empty) '#())
+
+(define (skew-heap-singleton e)
+  (vector e '#() '#()))
+
+(define (skew-heap-union heap0 heap1)
+  (match `#(,(force heap0) ,(force heap1))
+    [ #( #() _ )
+      heap1
+      ]
+    [ #( _ #() )
+      heap0
+      ]
+    [ #( #(e0 l0 r0) #(e1 l1 r1) )
+      (if (<= e0 e1)
+        (vector e0 (delay (skew-heap-union heap1 r0)) l0)
+        (vector e1 (delay (skew-heap-union heap0 r1)) l1)
+        )
+      ]
+    ))
+
+(define (skew-heap-insert e heap)
+  (skew-heap-union heap (skew-heap-singleton e))
+  )
+
+(define (skew-heap-extract-min heap)
+  (match (force heap)
+    [ #() (values #f #f) ]
+    [ #(e l r)
+      (values e (skew-heap-union l r))
+      ]))
+
+;;; Runner
 
 (define (run parser solver emitter)
   (dotimes (n (line-read))
