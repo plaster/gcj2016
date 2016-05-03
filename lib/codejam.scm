@@ -3,7 +3,11 @@
 (define-module codejam
   (export-all))
 
+(select-module codejam)
+
 (use gauche.parameter)
+
+;; I/O helper
 
 (define (line-read :optional [reader read])
   (with-input-from-string (read-line) reader))
@@ -23,7 +27,11 @@
 (define (read-matrix rows cols :optional [reader read-char])
   (replist rows (line-read$ (replist$ cols reader))))
 
+;; Parameter to output "Case #~a:"
+
 (define current-case (make-parameter #f))
+
+;; Runner
 
 (define (run parser solver emitter)
   (dotimes (n (line-read))
@@ -44,3 +52,5 @@
       (parameterize [[current-case (+ i 1)]]
         (apply emitter (vector-ref solved i))
         ))))
+
+(provide "codejam")
