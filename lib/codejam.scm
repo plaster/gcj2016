@@ -6,6 +6,7 @@
 (select-module codejam)
 
 (use gauche.parameter)
+(use util.match)
 
 ;;; I/O helper
 
