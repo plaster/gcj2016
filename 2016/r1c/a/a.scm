@@ -11,19 +11,50 @@
 (define (main args)
   (run parse solve emit))
 
-(define (emit . xs)
+(define (emit plan)
   (format #t "Case #~a: ~a\n"
           (current-case)
-          (string-join (map x->string xs) " ")
+          (string-join (map list->string plan) " ")
           ))
 
 (define (parse)
   (let* [[N (line-read)]
-         [PS (line-read (replist$ N read))
+         [_PS (line-read (replist$ N read))
              ]
          ]
-    (values N PS)))
+    (values N _PS)))
 
-(define (solve . args)
-  args
-  )
+(define *label* (string->list "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+
+(define (solve N _PS)
+  (let f [[PS (sort (map cons *label* _PS) > cdr)]
+          [plan '()]
+          ]
+    (let g [[PS PS]
+            [PS2 '()]
+            [plan plan]
+            ]
+      (match PS
+        [ ()
+         (match PS2
+           [()
+            plan
+            ]
+           [else
+            (f (sort (remove (.$ (pa$ = 0) cdr) PS2) > cdr)
+               plan)
+            ])
+         ]
+        [ ((L . x))
+         (g '() PS2
+            `( (,L) . ,plan)
+            )
+         ]
+        [ ((L0 . x0) (L1 . x1) . PS )
+         (g PS `((,L0 . ,(- x0 1) )
+                 (,L1 . ,(- x1 1) )
+                 . ,PS2)
+            `( (,L0 ,L1) . ,plan)
+            )
+         ]
+        ))))
