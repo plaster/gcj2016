@@ -27,7 +27,7 @@
 (define *label* (string->list "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
 
 (define (solve N _PS)
-  (let f [[PS (sort (map cons *label* _PS) > cdr)]
+  (let f [[PS (sort (map cons *label* _PS) < cdr)]
           [plan '()]
           ]
     (let g [[PS PS]
@@ -41,12 +41,13 @@
             plan
             ]
            [else
-            (f (sort (remove (.$ (pa$ = 0) cdr) PS2) > cdr)
+            (f (sort (remove (.$ (pa$ = 0) cdr) PS2) < cdr)
                plan)
             ])
          ]
         [ ((L . x))
-         (g '() PS2
+         (g '()
+            `((,L . ,(- x 1)) . ,PS2)
             `( (,L) . ,plan)
             )
          ]
