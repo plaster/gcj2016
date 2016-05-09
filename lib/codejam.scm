@@ -1,4 +1,4 @@
-;;;; codejam - Common Utility for Google Code Jam
+;;;; codejam - Common Utility Module for Google Code Jam
 
 (define-module codejam
   (export-all))
