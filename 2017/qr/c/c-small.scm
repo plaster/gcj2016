@@ -9,7 +9,7 @@
 (use gauche.sequence)
 
 (define (main args)
-  (run parse solve emit))
+  (run/parallel parse solve emit 4))
 
 (define (emit . xs)
   (format #t "Case #~a: ~a\n"
